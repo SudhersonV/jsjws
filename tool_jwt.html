@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset='utf-8' />
-<meta http-equiv="X-UA-Compatible" content="chrome=1" />
-<meta name="description" content="jsjws : pure JavaScript implementation of JSON Web Signature" />
-<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-<title>Online JWT generator and verifyer</title>
+  <meta charset='utf-8' />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+  <meta name="description" content="jsjws : pure JavaScript implementation of JSON Web Signature" />
+  <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+  <title>Online JWT generator and verifyer</title>
 
-<script language="JavaScript" type="text/javascript" src="http://kjur.github.io/jsrsasign/jsrsasign-4.1.4-all-min.js"></script>
-<script language="JavaScript" type="text/javascript" src="ext/json-sans-eval-min.js"></script>
-<script language="JavaScript" type="text/javascript" src="jws-3.1.js"></script>
+  <script language="JavaScript" type="text/javascript" src="http://kjur.github.io/jsrsasign/jsrsasign-4.1.4-all-min.js"></script>
+  <script language="JavaScript" type="text/javascript" src="ext/json-sans-eval-min.js"></script>
+  <script language="JavaScript" type="text/javascript" src="jws-3.1.js"></script>
 
-<script language="JavaScript" type="text/javascript">
+  <script language="JavaScript" type="text/javascript">
 function _doVerify() {
   _doDecode();
 
@@ -58,7 +59,9 @@ function _doSign() {
   //alert(sClaim);
   var alg = f.alg1.options[f.alg1.selectedIndex].value;
   //alert(alg);
-  var pHeader = {'alg': alg, 'typ': 'JWT'};
+  //var pHeader = {'alg': alg, 'typ': 'JWT'};
+  var pHeader = _getHeader();
+  pHeader['alg'] = alg; 
   var sHeader = JSON.stringify(pHeader);
   var key = f.key1.value;
   var pass = f.pass1.value;
@@ -71,22 +74,30 @@ function _doSign() {
   f.jws1.value = sJWS;
 }
 
+
+function _getHeader(){
+  var h = {};
+  if (document.form1.typ.value != '')
+    h.typ = document.form1.typ.value;
+  if (document.form1.kid.value != '')
+    h.kid = document.form1.kid.value;
+  return h;
+}
+
 function _getClaim() {
   var r = {};
   if (document.form1.iss1.value != '')
     r.iss = document.form1.iss1.value;
   if (document.form1.sub1.value != '')
     r.sub = document.form1.sub1.value;
-  if (document.form1.nbf1.value != '')
-    r.nbf = KJUR.jws.IntDate.get(document.form1.nbf1.value);
-  if (document.form1.exp1.value != '')
-    r.exp = KJUR.jws.IntDate.get(document.form1.exp1.value);
-  if (document.form1.iat1.value != '')
-    r.iat = KJUR.jws.IntDate.get(document.form1.iat1.value);
+  if (document.form1.box_sub_type.value != '')
+    r.box_sub_type = document.form1.box_sub_type.value;
+  if (document.form1.aud.value != '')
+    r.aud = document.form1.aud.value;
   if (document.form1.jti1.value != '')
     r.jti = document.form1.jti1.value;
-  if (document.form1.typ1.value != '')
-    r.typ = document.form1.typ1.value;
+  if (document.form1.exp1.value != '')
+    r.exp = KJUR.jws.IntDate.get(document.form1.exp1.value);
   return r;
 }
 
@@ -349,48 +360,55 @@ var k6CertPem = "" +
 
 <body>
 
-<!-- HEADER -->
-<div id="header_wrap" class="outer">
-<header class="inner">
-<h1 id="project_title">Online JWT generator and verifyer</h1>
-<h2 id="project_tagline">You can generate and verify signed JSON Web Token(JWT) online.</h2>
+  <!-- HEADER -->
+  <div id="header_wrap" class="outer">
+    <header class="inner">
+      <h1 id="project_title">Online JWT generator and verifyer</h1>
+      <h2 id="project_tagline">You can generate and verify signed JSON Web Token(JWT) online.</h2>
 
-<a href="http://kjur.github.io/jsjws/">TOP</a> | 
-<a href="https://github.com/kjur/jsjws/tags/" target="_blank">DOWNLOADS</a> | 
-<a href="https://github.com/kjur/jsjws/wiki#programming-tutorial">TUTORIALS</a> | 
-<a href="http://kjur.github.io/jsjws/api/" target="_blank">API REFERENCE</a> | 
-<a href="http://kjur.github.io/jsjws/index.html#demo" target="_blank">DEMOS</a> | 
-</header>
-</div>
+      <a href="http://kjur.github.io/jsjws/">TOP</a> |
+      <a href="https://github.com/kjur/jsjws/tags/" target="_blank">DOWNLOADS</a> |
+      <a href="https://github.com/kjur/jsjws/wiki#programming-tutorial">TUTORIALS</a> |
+      <a href="http://kjur.github.io/jsjws/api/" target="_blank">API REFERENCE</a> |
+      <a href="http://kjur.github.io/jsjws/index.html#demo" target="_blank">DEMOS</a> |
+    </header>
+  </div>
 
-<!-- MAIN CONTENT -->
-<div id="main_content_wrap" class="outer">
-<section id="main_content" class="inner">
-<!-- now editing -->
-<form name="form1">
-<h4>(Step1) Set Claim.</h4>
+  <!-- MAIN CONTENT -->
+  <div id="main_content_wrap" class="outer">
+    <section id="main_content" class="inner">
+      <!-- now editing -->
+      <form name="form1">
 
-<p>
-Set claim value of JWT token.
-</p>
+        <h4>(Step0) Set Claim.</h4>
+        <p>
+          Set Header.
+        </p>
+        <p>
+          <input name="typ" type="text" size="20" value="JWT" /> Type<br/>
+          <input name="kid" type="text" size="20" value="" /> Public Key ID<br/>
 
-<p>
-<input name="iss1" type="text" size="70" value="https://jwt-idp.example.com"/> Issuer(iss)<br/>
-<input name="sub1" type="text" size="70" value="mailto:mike@example.com"/> Subject(sub)<br/>
-<input name="nbf1" type="text" size="70" value="now"/> Not Before Time(nbf)<br/>
-<input name="exp1" type="text" size="70" value="now + 1hour"/> Expiration Time(exp)<br/>
-<input name="iat1" type="text" size="70" value="now"/> Issue At Time(iat)<br/>
-<input name="jti1" type="text" size="70" value="id123456"/> JWT ID(jti)<br/>
-<input name="typ1" type="text" size="70" value="https://example.com/register"/> Type(typ)<br/>
-NOTE: As for 'time' representation, please see 
-<a href="http://kjur.github.io/jsjws/api/symbols/KJUR.jws.IntDate.html#.get">here</a> in detail.
+          <h4>(Step1) Set Claim.</h4>
 
-<h4>(Step2) Choose issuer key and JWS signing algorithm.</h4>
+          <p>
+            Set claim value of JWT token.
+          </p>
+
+          <p>
+            <input name="iss1" type="text" size="70" value="https://jwt-idp.example.com" /> Issuer(iss)<br/>
+            <input name="sub1" type="text" size="70" value="mailto:mike@example.com" /> Subject(sub)<br/>
+            <input name="box_sub_type" type="text" size="70" value="user" /> box_sub_type<br/>
+            <input name="aud" type="text" size="70" value="https://api.box.com/oauth2/token" /> aud<br/>
+            <input name="jti1" type="text" size="70" value="id123456" /> JWT ID(jti)<br/>
+            <input name="exp1" type="text" size="70" value="now + 1hour" /> Expiration Time(exp)<br/> NOTE: As for 'time'
+            representation, please see
+            <a href="http://kjur.github.io/jsjws/api/symbols/KJUR.jws.IntDate.html#.get">here</a> in detail.
+
+            <h4>(Step2) Choose issuer key and JWS signing algorithm.</h4>
 
 
-<b>Private key or shared secret:</b><br/>
-Choose JWS signature algorithm and default value: <br/>
-<select name="alg1" onChange="_setAlg()">
+            <b>Private key or shared secret:</b><br/> Choose JWS signature algorithm and default value: <br/>
+            <select name="alg1" onChange="_setAlg()">
 <option value="none" selected/> none (no signature)
 <option value="HS256"/> HS256 (HmacSHA256) with default shared key
 <option value="HS384"/> HS384 (HmacSHA384) with default shared key
@@ -407,23 +425,22 @@ Choose JWS signature algorithm and default value: <br/>
 <option value="RS256"/> SHA256withRSA with PKCS#8 plain private key(z4)
 <option value="RS256"/> SHA256withRSA with PKCS#8 encrypted private key(z4)
 </select>
-<br/>
-Or specify signature algorithm, private key, private key passcode and/or shared secret:
-<textarea name="key1" cols="65" rows="3"></textarea><br/>
-passcode for private key: <input name="pass1" type="text" cols="40"/><br/>
-<i>NOTE: Off course you can set your own private key and passcode. 
+            <br/> Or specify signature algorithm, private key, private key passcode and/or shared secret:
+            <textarea name="key1" cols="65" rows="3"></textarea><br/> passcode for private key: <input name="pass1" type="text"
+              cols="40" /><br/>
+            <i>NOTE: Off course you can set your own private key and passcode. 
 Please care of proper signature algorithm 
 when you set your own key and pass code.</i>
 
-<h4>(Step3) Press "Sign it!"</h4>
-To generate signed JWT just pass 'Sign it!'.
-<input type="button" value="Sign it!" onClick="_doSign();"/> <br/>
-<textarea name="jws1" cols="65" rows="3"></textarea><br/>
+            <h4>(Step3) Press "Sign it!"</h4>
+            To generate signed JWT just pass 'Sign it!'.
+            <input type="button" value="Sign it!" onClick="_doSign();" /> <br/>
+            <textarea name="jws1" cols="65" rows="3"></textarea><br/>
 
-<h4>(Step4) Choose proper public key and verify it.</h4>
-To verify the above JWT signature please choose proper key.
+            <h4>(Step4) Choose proper public key and verify it.</h4>
+            To verify the above JWT signature please choose proper key.
 
-<select name="alg2" onChange="_setAlg2()">
+            <select name="alg2" onChange="_setAlg2()">
 <option value="none" selected/> none (no signature)
 <option value="HS"/> HS* (HmacSHA*) with default shared key
 <option value="RSPS-PUB"/> default PKCS#8 public key (RSA z4) for RS* PS* JWT
@@ -433,38 +450,36 @@ To verify the above JWT signature please choose proper key.
 <option value="ES384-PUB"/> default public key for ES384 (SHA384withECDSA NIST P-384 k6)
 <option value="ES384-PUB"/> default X.509 certificate for ES384 (SHA384withECDSA NIST P-384 k6)
 </select>
-<br/>
-<textarea name="key2" cols="65" rows="3"></textarea><br/>
-<br/>
-NOTE: When you sign JWT with your own key, please fill your
-own public key or X.509 certificate to verify it.
-<br/>
-<input type="button" value="Verify it!" onClick="_doVerify()"/>
-or 
-<input type="button" value="Just Decode JWT" onClick="_doDecode()"/>
+            <br/>
+            <textarea name="key2" cols="65" rows="3"></textarea><br/>
+            <br/> NOTE: When you sign JWT with your own key, please fill your own public key or X.509 certificate to verify
+            it.
+            <br/>
+            <input type="button" value="Verify it!" onClick="_doVerify()" /> or
+            <input type="button" value="Just Decode JWT" onClick="_doDecode()" />
 
-<h2>Parsed JWT</h2>
-<b>Header</b><br/>
-<textarea name="im_head1" cols="100" rows="5"></textarea><br/>
-<b>Payload</b><br/>
-<textarea name="im_payload1" cols="100" rows="8"></textarea><br/>
-</form>
-<!-- now editing -->
+            <h2>Parsed JWT</h2>
+            <b>Header</b><br/>
+            <textarea name="im_head1" cols="100" rows="5"></textarea><br/>
+            <b>Payload</b><br/>
+            <textarea name="im_payload1" cols="100" rows="8"></textarea><br/>
+      </form>
+      <!-- now editing -->
 
-</section>
-</div>
+    </section>
+  </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">jsjws maintained by <a href="https://github.com/kjur">@kjur</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-<div align="center" style="color: white">
-Copyright &copy; 2013 Kenji Urushima. All rights reserved.
-</div>
-      </footer>
-    </div>
+  <!-- FOOTER  -->
+  <div id="footer_wrap" class="outer">
+    <footer class="inner">
+      <p class="copyright">jsjws maintained by <a href="https://github.com/kjur">@kjur</a></p>
+      <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      <div align="center" style="color: white">
+        Copyright &copy; 2013 Kenji Urushima. All rights reserved.
+      </div>
+    </footer>
+  </div>
 
-  </body>
+</body>
+
 </html>
-
